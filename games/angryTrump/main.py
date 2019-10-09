@@ -8,6 +8,12 @@ win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
 
 pygame.display.set_caption('Angry Trump')
 
+pygame.mixer.music.load('sound/music.mp3')
+pygame.mixer.music.set_volume(0.1)
+pygame.mixer.music.play()
+
+bulletSound = pygame.mixer.Sound('sound/fire.wav')
+
 walkRight = [
     pygame.image.load('images/right_1.png'), pygame.image.load('images/right_2.png'),
     pygame.image.load('images/right_3.png'), pygame.image.load('images/right_4.png'),
@@ -97,6 +103,8 @@ while run:
         if len(bullets) < 5:
             bullets.append(Bullet(x=round(x + heroWidth // 2), y=round(y + heroHeight // 2),
                                   radius=5, color=(255, 0, 0), facing=facing))
+            bulletSound.play()
+
 
     if keys[pygame.K_LEFT] and x > outline:
         x -= speed
