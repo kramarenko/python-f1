@@ -107,5 +107,3 @@ venv.bak/
 # IntellijIdea files
 *.iml
 .idea
-
-/games/breakout/.idea
