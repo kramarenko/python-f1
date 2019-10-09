@@ -105,7 +105,6 @@ while run:
                                   radius=5, color=(255, 0, 0), facing=facing))
             bulletSound.play()
 
-
     if keys[pygame.K_LEFT] and x > outline:
         x -= speed
         moveLeft = True
@@ -134,6 +133,9 @@ while run:
         else:
             isJump = False
             jumpCount = 10
+
+    if keys[pygame.K_ESCAPE]:
+        exit()
 
     drawWindow()
 
