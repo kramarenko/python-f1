@@ -15,6 +15,7 @@ class Bullet(pygame.sprite.Sprite):
     def load_image(self):
         img_dir = path.join(path.dirname(__file__), 'img')
         image = pygame.image.load(path.join(img_dir, "laserRed16.png")).convert()
+        image = pygame.transform.scale(image, (8, 38))
         image.set_colorkey((0, 0, 0))
         return image
 

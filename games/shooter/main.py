@@ -25,32 +25,6 @@ pygame.display.set_caption("Shooter!")
 clock = pygame.time.Clock()
 font_name = pygame.font.match_font('arial')
 
-img_dir = path.join(path.dirname(__file__), 'img')
-sound_dir = path.join(path.dirname(__file__), 'sound')
-background = pygame.image.load(path.join(img_dir, 'starfield.jpg')).convert()
-background_rect = background.get_rect()
-pygame.mixer.music.load(path.join(sound_dir, 'theme.mp3'))
-pygame.mixer.music.set_volume(0.4)
-
-shield_sound = pygame.mixer.Sound(path.join(sound_dir, 'pow4.wav'))
-power_sound = pygame.mixer.Sound(path.join(sound_dir, 'pow5.wav'))
-
-player_img = pygame.image.load(path.join(img_dir, "playerShip1_orange.png")).convert()
-player_mini_img = pygame.transform.scale(player_img, (25, 19))
-player_mini_img.set_colorkey(BLACK)
-
-powerup_images = {}
-powerup_images['shield'] = pygame.image.load(path.join(img_dir, 'shield_gold.png')).convert()
-powerup_images['gun'] = pygame.image.load(path.join(img_dir, 'bolt_gold.png')).convert()
-
-
-all_sprites = pygame.sprite.Group()
-mobs = pygame.sprite.Group()
-powerups = pygame.sprite.Group()
-
-user = player.Player(WIDTH, HEIGHT, POWERUP_TIME)
-all_sprites.add(user)
-
 
 def draw_text(surf, text, size, x, y):
     font = pygame.font.Font(font_name, size)
@@ -86,17 +60,71 @@ def draw_lives(surf, x, y, lives, img):
         surf.blit(img, img_rect)
 
 
+def show_go_screen():
+    screen.blit(background, background_rect)
+    draw_text(screen, "SHMUP!", 64, WIDTH / 2, HEIGHT / 4)
+    draw_text(screen, "Arrow keys move, Space to fire", 22,
+              WIDTH / 2, HEIGHT / 2)
+    draw_text(screen, "Press a key to begin", 18, WIDTH / 2, HEIGHT * 3 / 4)
+    pygame.display.flip()
+    waiting = True
+    while waiting:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYUP:
+                waiting = False
+
+
+img_dir = path.join(path.dirname(__file__), 'img')
+sound_dir = path.join(path.dirname(__file__), 'sound')
+background = pygame.image.load(path.join(img_dir, 'starfield.jpg')).convert()
+background_rect = background.get_rect()
+pygame.mixer.music.load(path.join(sound_dir, 'theme.mp3'))
+pygame.mixer.music.set_volume(0.4)
+
+shield_sound = pygame.mixer.Sound(path.join(sound_dir, 'pow4.wav'))
+power_sound = pygame.mixer.Sound(path.join(sound_dir, 'pow5.wav'))
+
+player_img = pygame.image.load(path.join(img_dir, "playerShip1_orange.png")).convert()
+player_mini_img = pygame.transform.scale(player_img, (25, 19))
+player_mini_img.set_colorkey(BLACK)
+
+powerup_images = {}
+powerup_images['shield'] = pygame.image.load(path.join(img_dir, 'shield_gold.png')).convert()
+powerup_images['gun'] = pygame.image.load(path.join(img_dir, 'bolt_gold.png')).convert()
+
+all_sprites = pygame.sprite.Group()
+mobs = pygame.sprite.Group()
+powerups = pygame.sprite.Group()
+
+user = player.Player(WIDTH, HEIGHT, POWERUP_TIME)
+all_sprites.add(user)
+
 for i in range(8):
     newmob()
 
 score = 0
 pygame.mixer.music.play(loops=-1)
+game_over = True
 running = True
 while running:
+    if game_over:
+        show_go_screen()
+        game_over = False
+        all_sprites = pygame.sprite.Group()
+        mobs = pygame.sprite.Group()
+        powerups = pygame.sprite.Group()
+        user = player.Player(WIDTH, HEIGHT, POWERUP_TIME)
+        all_sprites.add(user)
+        for i in range(8):
+            newmob()
+        score = 0
+
     clock.tick(FPS)
 
     for event in pygame.event.get():
-
         if event.type == pygame.QUIT:
             running = False
 
@@ -115,7 +143,7 @@ while running:
             user.shield = 100
 
     if user.lives == 0 and not death_explosion.alive():
-        running = False
+        game_over = True
 
     hits = pygame.sprite.groupcollide(mobs, user.get_bullet(), True, True)
     for hit in hits:
